@@ -501,12 +501,27 @@ qm set $VMID \
   -boot order=scsi0 \
   -serial0 socket >/dev/null
 
+msg_info "Enabling SSH Password Login & Creating Default User"
+
+mkdir -p /var/lib/vz/snippets
+
+cat <<EOF > /var/lib/vz/snippets/ubuntu-${VMID}-cloudinit.yml
+#cloud-config
+ssh_pwauth: true
+disable_root: false
+chpasswd:
+  list: |
+    ubuntu:Passw0rd123
+  expire: false
+EOF
+
 qm set $VMID --ciuser ubuntu
 qm set $VMID --cipassword 'Passw0rd123'
 qm set $VMID --cicustom "user=local:snippets/ubuntu-${VMID}-cloudinit.yml"
 qm set $VMID --sshkeys ''
 
 msg_ok "SSH Login Enabled (user: ubuntu / password: Passw0rd123)"
+
 DESCRIPTION=$(
   cat <<EOF
 <div align='center'>
