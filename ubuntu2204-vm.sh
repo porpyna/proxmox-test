@@ -495,19 +495,18 @@ qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -bios ovmf${CPU_TYPE} 
 pvesm alloc $STORAGE $VMID $DISK0 4M 1>&/dev/null
 qm importdisk $VMID ${FILE} $STORAGE ${DISK_IMPORT:-} 1>&/dev/null
 qm set $VMID \
-msg_info "Configuring Cloud-Init for Password Login"
-qm set $VMID --ciuser ubuntu
-qm set $VMID --cipassword 'Passw0rd123'
-qm set $VMID --sshkeys ''
-echo "ssh_pwauth: true" > /var/lib/vz/snippets/ubuntu-${VMID}-cloudinit.yml
-echo "disable_root: false" >> /var/lib/vz/snippets/ubuntu-${VMID}-cloudinit.yml
-qm set $VMID --cicustom "user=local:snippets/ubuntu-${VMID}-cloudinit.yml"
-msg_ok "Enabled SSH Password Login & Created user 'ubuntu' with password 'Passw0rd123'"
   -efidisk0 ${DISK0_REF}${FORMAT} \
   -scsi0 ${DISK1_REF},${DISK_CACHE}${THIN}size=${DISK_SIZE} \
   -ide2 ${STORAGE}:cloudinit \
   -boot order=scsi0 \
   -serial0 socket >/dev/null
+
+qm set $VMID --ciuser ubuntu
+qm set $VMID --cipassword 'Passw0rd123'
+qm set $VMID --cicustom "user=local:snippets/ubuntu-${VMID}-cloudinit.yml"
+qm set $VMID --sshkeys ''
+
+msg_ok "SSH Login Enabled (user: ubuntu / password: Passw0rd123)"
 DESCRIPTION=$(
   cat <<EOF
 <div align='center'>
