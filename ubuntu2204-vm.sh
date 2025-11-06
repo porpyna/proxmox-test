@@ -518,7 +518,6 @@ EOF
 qm set $VMID --ciuser ubuntu
 qm set $VMID --cipassword 'Passw0rd123'
 qm set $VMID --cicustom "user=local:snippets/ubuntu-${VMID}-cloudinit.yml"
-qm set $VMID --sshkeys ""
 
 msg_ok "SSH Login Enabled (user: ubuntu / password: Passw0rd123)"
 
