@@ -142,6 +142,28 @@ function check_root() {
 pve_check() {
   local PVE_VER
   PVE_VER="$(pveversion | awk -F'/' '{print $2}' | awk -F'-' '{print $1}')"
+
+  # Check for Proxmox VE 8.x: allow 8.0–8.9
+  if [[ "$PVE_VER" =~ ^8\.([0-9]+) ]]; then
+    local MINOR="${BASH_REMATCH[1]}"
+    if ((MINOR < 0 || MINOR > 9)); then
+      msg_error "This version of Proxmox VE is not supported."
+      msg_error "Supported: Proxmox VE version 8.0 – 8.9"
+      exit 1
+    fi
+    return 0
+  fi
+
+  # Check for Proxmox VE 9.x: allow ONLY 9.0
+  if [[ "$PVE_VER" =~ ^9\.([0-9]+) ]]; then
+    local MINOR="${BASH_REMATCH[1]}"
+    if ((MINOR != 0)); then
+      msg_error "This version of Proxmox VE is not yet supported."
+      msg_error "Supported: Proxmox VE version 9.0"
+      exit 1
+    fi
+    return 0
+  fi
   return 0
   # All other unsupported versions
   msg_error "This version of Proxmox VE is not supported."
@@ -405,7 +427,6 @@ function start_script() {
 }
 check_root
 arch_check
-pve_check
 ssh_check
 start_script
 post_to_api_vm
